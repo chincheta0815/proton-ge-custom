@@ -106,3 +106,11 @@
 [submodule "meson"]
 	path = meson
 	url = https://github.com/mesonbuild/meson.git
+[submodule "jack2"]
+	path = jack2
+	url = https://github.com/jackaudio/jack2.git
+        branch = 1.9.22
+[submodule "pipewire"]
+	path = pipewire
+	url = https://gitlab.freedesktop.org/pipewire/pipewire.git
+	branch = 1.6.3

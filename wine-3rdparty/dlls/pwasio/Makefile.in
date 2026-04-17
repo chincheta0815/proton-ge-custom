@@ -1,0 +1,15 @@
+MODULE = pwasio.dll
+UNIXLIB = pwasio.so
+
+UNIX_CFLAGS = $(PIPEWIRE_CFLAGS)
+UNIX_LIBS = $(PIPEWIRE_LIBS) -lodbc32 -lole32 -luuid -lwinmn -lshlwapi -lgdi32 -lcomctl32
+
+EXTRADEFS = -DPWASIO_VERSION_MAJOR=0 -DPWASIO_VERSION_MINOR=1 -DPWASIO_VERSION_PATCH=0 \
+            -D_REENTRANT -D_GNU_SOURCE
+
+EXTRAINCL = $(PIPEWIRE_CFLAGS)
+EXTRACFLAGS = -Wextra -Wall -Wno-missing-field-initializers -std=gnu23
+
+SOURCES   = main.c \
+            panel.rc \
+            pwasio.c

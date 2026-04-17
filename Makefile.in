@@ -141,6 +141,7 @@ include $(SRC)/make/rules-cmake.mk
 include $(SRC)/make/rules-autoconf.mk
 include $(SRC)/make/rules-configure.mk
 include $(SRC)/make/rules-winemaker.mk
+include $(SRC)/make/rules-winedll-in-tree.mk
 include $(SRC)/make/rules-wine-requests.mk
 include $(SRC)/make/rules-wine-tools.mk
 include $(SRC)/make/rules-cargo.mk
@@ -625,6 +626,57 @@ $(eval $(call rules-configure,ffmpeg,aarch64,unix))
 
 
 ##
+## pipewire
+##
+
+#PIPEWIRE_MESON_ARGS = \
+#	-D bluez5-codec-lc3plus=disabled
+#	-D bluez5-codec-ldac-dec=disabled
+#	-D docs=disabled
+#	-D jack-devel=false
+#	-D man=disabled
+#	-D rlimits-install=false
+#	-D selinux=disabled
+#	-D session-managers=[]
+#	-D snap=disabled
+#	-D udevrulesdir=/usr/lib/udev/rules.d
+
+#PIPEWIRE_i386_MESON_ARGS = \
+#	-D libjack-path=$(PIPEWIRE_i386_LIBDIR)
+
+#PIPEWIRE_x86_64_MESON_ARGS = \
+#       -D libjack-path=$(PIPEWIRE_x86_64_LIBDIR)
+
+#PIPEWIRE_aarch64_MESON_ARGS = \
+#       -D libjack-path=$(PIPEWIRE_aarch64_LIBDIR)
+
+#$(eval $(call rules-source,pipewire,$(SRCDIR)/pipewire))
+#$(eval $(call rules-meson,pipewire,i386,unix))
+#$(eval $(call rules-meson,pipewire,x86_64,unix))
+#$(eval $(call rules-meson,pipewire,aarch64,unix))
+
+
+##
+## wineasio (out-of-tree build)
+##
+
+WINEASIO_DEPENDS = wine
+
+WINEASIO_i386_DLL_NAME_PREFIX = "wineasio32"
+WINEASIO_x86_64_DLL_NAME_PREFIX = "wineasio64"
+
+WINEASIO_EXTRA_CFLAGS = -D_REENTRANT -fPIC -Wall -pipe
+WINEASIO_EXTRA_CFLAGS += -fno-strict-aliasing -Wdeclaration-after-statement -Wwrite-strings -Wpointer-arith
+WINEASIO_EXTRA_CFLAGS += -Werror=implicit-function-declaration -DNDEBUG -fvisibility=hidden
+
+WINEASIO_WINEGCC_LDFLAGS = -lodbc32 -lole32 -luuid -lwinmm 
+
+$(eval $(call rules-source,wineasio,$(SRCDIR)/wine-3rdparty/dlls/wineasio))
+$(eval $(call rules-winedll-in-tree,wineasio,i386,unix))
+$(eval $(call rules-winedll-in-tree,wineasio,x86_64,unix))
+$(eval $(call rules-winedll-in-tree,wineasio,aarch64,unix))
+
+##
 ## gst-libav
 ##
 
@@ -889,7 +941,6 @@ WINE_SOURCE_ARGS = \
   --exclude server/request_trace.h \
 
 WINE_AUTOCONF_ARGS = \
-  --enable-werror \
   --with-wayland \
   --with-mingw=$(MINGW_TYPE) \
   --with-gstreamer \
@@ -945,6 +996,7 @@ ifeq ($(findstring i386,$(unix_ARCHS)),)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine-preloader,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin)
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin/
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin/
 else
 	cp -a $(WINE_x86_64_DST)/bin/wine64 $(WINE_x86_64_DST)/bin/wine
 	cp -a $(WINE_x86_64_DST)/bin/wine64-preloader $(WINE_x86_64_DST)/bin/wine-preloader
@@ -954,12 +1006,14 @@ else
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine64-preloader,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin)
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin/
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin/
 
 	mkdir -p $(DST_DIR)/bin-wow64
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine,$(DST_DIR)/bin-wow64)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine-preloader,$(DST_DIR)/bin-wow64)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin-wow64)
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin-wow64/
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin-wow64/
 endif
 	mkdir -p $(DST_DIR)/share
 	cp -a $(WINE_x86_64_DST)/share/wine $(DST_DIR)/share
@@ -976,6 +1030,7 @@ $(OBJ)/.wine-i386-post-build:
 	mkdir -p $(DST_DIR)/bin
 	$(call install-strip,$(WINE_i386_DST)/bin/wine,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_i386_DST)/bin/wine-preloader,$(DST_DIR)/bin)
+	cp -a $(WINE_i386_DST)/bin/regsvr32 $(DST_DIR)/bin/
 	touch $@
 
 $(OBJ)/.wine-aarch64-post-build:
@@ -984,6 +1039,7 @@ $(OBJ)/.wine-aarch64-post-build:
 	$(call install-strip,$(WINE_aarch64_DST)/bin/wine-preloader,$(DST_DIR)/bin-arm64)
 	$(call install-strip,$(WINE_aarch64_DST)/bin/wineserver,$(DST_DIR)/bin-arm64)
 	cp -a $(WINE_aarch64_DST)/bin/msidb $(DST_DIR)/bin-arm64/
+	cp -a $(WINE_aarch64_DST)/bin/regsvr32 $(DST_DIR)/bin-arm64/
 ifeq ($(findstring x86_64,$(unix_ARCHS)),)
 	mkdir -p $(DST_DIR)/share
 	cp -a $(WINE_aarch64_DST)/share/wine $(DST_DIR)/share
@@ -1658,7 +1714,7 @@ endif
 
 default_pfx: vkd3d
 
-default_pfx: wine gst_good gst_bad gst_libav gst_plugins_rs lsteamclient steamexe vrclient dxvk dxvk-nvapi vkd3d-proton
+default_pfx: wine wineasio gst_good gst_bad gst_libav gst_plugins_rs lsteamclient steamexe vrclient dxvk dxvk-nvapi vkd3d-proton
 	find $(DST_LIBDIR)/wine -type f -execdir chmod go-w '{}' '+'
 	rm -rf $(abspath $(DIST_PREFIX))
 	rm -rf $(abspath $(DIST_PREFIX_ARM64))

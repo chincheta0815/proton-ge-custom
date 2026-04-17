@@ -1,0 +1,8 @@
+MODULE = wineasio.dll
+
+UNIX_LIBS = -lodbc32 -lole32 -luuid -lwinmm
+
+SOURCES = main.c \
+          jackbridge.c \
+          asio.c \
+          regsvr.c

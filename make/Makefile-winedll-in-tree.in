@@ -1,0 +1,24 @@
+# Makefile for creating a out-of-tree WINE DLL in proton
+.PHONY: install-winedll
+
+WINEDLL_C_FILES=$(wildcard *.c)
+WINEDLL_OBJ_FILES=$(WINEDLL_C_FILES:.c=.c.o)
+
+WINEDLL_SPEC_FILE?=$(wildcard *.spec)
+
+%.c.o: %.c
+	$(CC) -c $(CFLAGS) $(WINEDLL_BITFLAG) $(WINEDLL_EXTRA_CFLAGS) $(WINEDLL_EXTRA_INCLUDES) $< -o $@
+
+$(WINEDLL_NAME_PREFIX).dll: $(WINEDLL_OBJ_FILES)
+	$(WINEDLL_WINEBUILD) $(WINEDLL_BITFLAG) --dll --fake-module -E $(WINEDLL_SPEC_FILE) $^ -o $@
+
+$(WINEDLL_NAME_PREFIX).so: $(WINEDLL_OBJ_FILES)
+	$(WINEDLL_WINEGCC) --winebuild $(WINEDLL_WINEBUILD) $(WINEDLL_SPEC_FILE) \
+		$(WINEDLL_BITFLAG) $(LDFLAGS) -shared $(WINEDLL_EXTRA_LDFLAGS) $^ -o $@
+
+winedll: $(WINEDLL_NAME_PREFIX).dll $(WINEDLL_NAME_PREFIX).so
+
+install-winedll:
+	install -m 644 $(WINEDLL_NAME_PREFIX).dll $(WINEDLL_INST_DLL_DIR)
+	install -m 644 $(WINEDLL_NAME_PREFIX).so $(WINEDLL_INST_SO_DIR)
+# LLNR
