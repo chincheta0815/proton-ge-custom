@@ -1,0 +1,13 @@
+MODULE    = wineasio.dll
+UNIXLIB   = wineasio.so
+IMPORTLIB = wineasio
+IMPORTS   = ole32 oleaut32 uuid advapi32 kernel32
+EXTRADLLFLAGS = -Wl,--image-base=0x10000000 -Wl,--disable-reloc-section
+DELAYIMPORTS = mfplat mf
+UNIX_CFLAGS  = -Wall -O2 -fPIC -fvisibility=hidden -DWINE_UNIX_LIB -D__WINESRC__
+UNIX_LDFLAGS = -shared -fPIC
+UNIX_LIBS    = -ldl -lpthread
+
+SOURCES = \
+        asio_pe.c \
+        asio_unix.c \

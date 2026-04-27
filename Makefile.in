@@ -141,6 +141,7 @@ include $(SRC)/make/rules-cmake.mk
 include $(SRC)/make/rules-autoconf.mk
 include $(SRC)/make/rules-configure.mk
 include $(SRC)/make/rules-winemaker.mk
+include $(SRC)/make/rules-wine-dll.mk
 include $(SRC)/make/rules-wine-requests.mk
 include $(SRC)/make/rules-wine-tools.mk
 include $(SRC)/make/rules-cargo.mk
@@ -863,6 +864,16 @@ $(eval $(call rules-cmake,vosk,aarch64,unix))
 
 
 ##
+## wineasio
+##
+WINEASIO_DEPENDS = wine
+
+$(eval $(call rules-source,wineasio,$(SRCDIR)/wineasio))
+$(eval $(call rules-wine-dll,wineasio,i386))
+$(eval $(call rules-wine-dll,wineasio,x86_64))
+$(eval $(call rules-wine-dll,wineasio,aarch64))
+
+##
 ## wine
 ##
 
@@ -944,6 +955,7 @@ ifeq ($(findstring i386,$(unix_ARCHS)),)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine-preloader,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin)
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin/
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin/
 else
 	cp -a $(WINE_x86_64_DST)/bin/wine64 $(WINE_x86_64_DST)/bin/wine
@@ -953,12 +965,14 @@ else
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine64,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine64-preloader,$(DST_DIR)/bin)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin)
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin/
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin/
 
 	mkdir -p $(DST_DIR)/bin-wow64
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine,$(DST_DIR)/bin-wow64)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wine-preloader,$(DST_DIR)/bin-wow64)
 	$(call install-strip,$(WINE_x86_64_DST)/bin/wineserver,$(DST_DIR)/bin-wow64)
+	cp -a $(WINE_x86_64_DST)/bin/regsvr32 $(DST_DIR)/bin/
 	cp -a $(WINE_x86_64_DST)/bin/msidb $(DST_DIR)/bin-wow64/
 endif
 	mkdir -p $(DST_DIR)/share
@@ -1658,7 +1672,7 @@ endif
 
 default_pfx: vkd3d
 
-default_pfx: wine gst_good gst_bad gst_libav gst_plugins_rs lsteamclient steamexe vrclient dxvk dxvk-nvapi vkd3d-proton
+default_pfx: wine wineasio gst_good gst_bad gst_libav gst_plugins_rs lsteamclient steamexe vrclient dxvk dxvk-nvapi vkd3d-proton
 	find $(DST_LIBDIR)/wine -type f -execdir chmod go-w '{}' '+'
 	rm -rf $(abspath $(DIST_PREFIX))
 	rm -rf $(abspath $(DIST_PREFIX_ARM64))
