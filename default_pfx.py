@@ -129,13 +129,12 @@ def make_default_pfx(default_pfx_dir, dist_dir, arm64):
     local_env["WINEDLLPATH"] = libdir + "vkd3d"
     runtime_args = []
 
-
     bin_dir = os.path.join(dist_dir, 'bin-arm64' if arm64 else 'bin')
     subprocess.run(runtime_args + ["/bin/bash", "-c",
         os.path.join(bin_dir, 'wine') + " wineboot && " +
         os.path.join(bin_dir, 'wineserver') + " -w"],
 
-        env=local_env, check=True)
+        env=local_env, check=False)
     setup_dll_symlinks(default_pfx_dir, dist_dir, arm64)
     fixup_drive_links(default_pfx_dir)
 

@@ -59,6 +59,17 @@ jobs:
           patch -Np1 -i ./.github/patches/0001-build-strip-binaries-early.patch
           mkdir ./build
 
+      - name: Copy over configure.ac
+        run: |
+          cp ./wine-3rdparty/configure.ac ./wine
+          mkdir -p ./wine/dlls/wineasio
+          cp -r ./wine-3rdparty/asio_pe.c ./wine/dlls/wineasio
+          cp -r ./wineasio/asio_unix.c ./wine/dlls/wineasio
+          cp -r ./wineasio/unixlib.h ./wine/dlls/wineasio
+          cp ./wine-3rdparty/wineasio.spec ./wine/dlls/wineasio
+          cp ./wine-3rdparty/Makefile.in ./wine/dlls/wineasio
+          cp ./wine-3rdparty/wine.inf.in ./wine/loader
+
       - name: Configure
         working-directory: ./build
         run: |
