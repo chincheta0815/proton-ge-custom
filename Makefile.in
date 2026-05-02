@@ -57,6 +57,9 @@ include $(SRC)/make/rules-configure.mk
 include $(SRC)/make/rules-winemaker.mk
 include $(SRC)/make/rules-cargo.mk
 
+include $(SRC)/make/rules-make-wineasio.mk
+include $(SRC)/make/rules-make-pwasio.mk
+
 # If CC is coming from make's defaults or nowhere, use our own default.  Otherwise respect environment.
 CCACHE_ENV := $(patsubst %,-e %,$(shell env|cut -d= -f1|grep '^CCACHE_'))
 ifeq ($(ENABLE_CCACHE),1)
@@ -371,7 +374,7 @@ $(DIST_FONTS): fonts
 ALL_TARGETS += dist
 GOAL_TARGETS += dist
 
-dist_prefix: wine gst_good gst_libav gst_plugins_rs
+dist_prefix: wine pwasio gst_good gst_libav gst_plugins_rs
 	find $(DST_LIBDIR32)/wine -type f -execdir chmod a-w '{}' '+'
 	find $(DST_LIBDIR64)/wine -type f -execdir chmod a-w '{}' '+'
 	rm -rf $(abspath $(DIST_PREFIX))
@@ -920,6 +923,63 @@ $(OBJ)/.wine-post-build32:
 	$(call install-strip,$(WINE_DST32)/bin/wine-preloader,$(DST_DIR)/bin)
 	touch $@
 
+
+##
+## wineasio
+##
+
+WINEASIO_DEPENDS = wine
+
+$(eval $(call rules-source,wineasio,$(SRCDIR)/wineasio/dlls/wineasio))
+$(eval $(call rules-make-wineasio,wineasio,32))
+$(eval $(call rules-make-wineasio,wineasio,64))
+
+
+##
+## pipewire (for build only)
+##
+
+#PIPEWIRE_MESON_ARGS = \
+#	-D bluez5-codec-lc3plus=disabled \
+#	-D bluez5-codec-ldac-dec=disabled \
+#	-D docs=disabled \
+#	-D man=disabled \
+#	-D rlimits-install=false \
+#	-D selinux=disabled \
+#	-D session-managers=[] \
+#	-D snap=disabled \
+#	-D udevrulesdir=/usr/lib/udev/rules.d \
+#	-D pw-cat=disabled \
+#	-D pw-cat-ffmpeg=disabled \
+#	-D avb=disabled \
+#	-D examples=disabled \
+#	-D tests=disabled \
+#	-D installed_tests=disabled
+
+#$(eval $(call rules-source,pipewire,$(SRCDIR)/pipewire))
+#$(eval $(call rules-meson,pipewire,32))
+#$(eval $(call rules-meson,pipewire,64))
+
+
+##
+## pwasio
+##
+
+PWASIO_DEPENDS = wine
+
+$(eval $(call rules-source,pwasio,$(SRCDIR)/pwasio/dlls/pwasio))
+$(eval $(call rules-make-pwasio,pwasio,32))
+$(eval $(call rules-make-pwasio,pwasio,64))
+
+#$(OBJ)/.pwasio-post-build32:
+#	rm -rf $(DST_DIR)/lib/pipewire-0.3
+#	rm -rf $(DST_DIR)/lib/spa-0.2
+#	rm -rf $(DST_DIR)/lib/pkgconfig
+
+#$(OBJ)/.pwasio-post-build64:
+#	rm -rf $(DST_DIR)/lib64/pipewire-0.3
+#	rm -rf $(DST_DIR)/lib64/spa-0.2
+#	rm -rf $(DST_DIR)/lib64/pkgconfig
 
 ##
 ## vrclient

@@ -1,0 +1,10 @@
+--- configure.ac	2026-05-02 21:50:57.000000000 +0200
++++ configure.ac	2026-05-02 21:51:56.000000000 +0200
+@@ -3444,6 +3444,7 @@
+ WINE_CONFIG_MAKEFILE(dlls/windowscodecsext/tests)
+ WINE_CONFIG_MAKEFILE(dlls/winealsa.drv)
+ WINE_CONFIG_MAKEFILE(dlls/wineandroid.drv)
++WINE_CONFIG_MAKEFILE(dlls/wineasio)
+ WINE_CONFIG_MAKEFILE(dlls/winebus.sys)
+ WINE_CONFIG_MAKEFILE(dlls/winecoreaudio.drv)
+ WINE_CONFIG_MAKEFILE(dlls/winecrt0)

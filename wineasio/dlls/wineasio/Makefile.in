@@ -1,0 +1,10 @@
+MODULE       = wineasio.dll
+UNIXLIB      = wineasio.so
+EXTRALIBS    = -lodbc32 -luuid 
+IMPORTS      = odbc32 ole32 uuid winmm
+
+C_SRCS = \
+	asio.c \
+	jackbridge.c \
+	main.c \
+	regsvr.c

@@ -1,0 +1,20 @@
+--- ./loader/wine.inf.in	2026-05-08 19:41:09.000000000 +0200
++++ ./loader/wine.inf.in	2026-05-08 19:44:57.000000000 +0200
+@@ -2642,6 +2642,8 @@
+ 10,,rundll.exe,rundll.exe16
+ 10,,twain.dll,twain.dll16
+ 10,,twain_32.dll
++10,,wineasio32.dll
++10,,pwasio32.dll
+ 10,twain_32,sane.ds
+ 10,twain_32,gphoto2.ds
+ 10,,winhelp.exe,winhelp.exe16
+@@ -2660,6 +2662,8 @@
+ [FakeDllsWin64]
+ 10,twain_64,sane.ds
+ 10,twain_64,gphoto2.ds
++10,,wineasio64.dll
++10,,pwasio64.dll
+ 
+ ; Wow64-only fake dlls
+ [FakeDllsWow64]

@@ -1,0 +1,10 @@
+--- ./loader/wine.inf.in	2026-05-03 12:55:51.000000000 +0200
++++ ./loader/wine.inf.in	2026-05-03 12:57:10.000000000 +0200
+@@ -2756,6 +2756,7 @@
+ 11,wbem,wmic.exe
+ 11,wbem,wmiutils.dll
+ 11,WindowsPowerShell\v1.0,powershell.exe
++11,,wineasio.dll
+ ; empty folders to make sure the parent dirs are not removed
+ 16410,Microsoft,
+ 16412,Microsoft,

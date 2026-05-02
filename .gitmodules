@@ -76,3 +76,6 @@
 [submodule "glslang"]
 	path = glslang
 	url = https://github.com/KhronosGroup/glslang
+[submodule "pipewire"]
+	path = pipewire
+	url = https://gitlab.freedesktop.org/pipewire/pipewire.git
